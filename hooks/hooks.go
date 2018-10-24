@@ -26,7 +26,7 @@ type PushEventWebhook struct {
 	pusher   string
 	commits  []Commit
 	URL      *url.URL
-	original originalWebhook
+	Original originalWebhook
 }
 
 // Parse reads the original webhook and parses it, in order to fill all the necessary fields
@@ -37,13 +37,13 @@ func (w PushEventWebhook) Parse() error {
 	var err error
 
 	// get normal entries
-	w.repo, err = jsonparser.GetString(w.original, "repository", "full_name")
+	w.repo, err = jsonparser.GetString(w.Original, "repository", "full_name")
 	if err != nil {
 		w.repo = ""
 		return err
 	}
 
-	ref, err := jsonparser.GetString(w.original, "ref")
+	ref, err := jsonparser.GetString(w.Original, "ref")
 	if err != nil {
 		w.branch = ""
 		return err
@@ -53,13 +53,13 @@ func (w PushEventWebhook) Parse() error {
 
 	w.branch = refSplit[2]
 
-	w.pusher, err = jsonparser.GetString(w.original, "pusher", "name")
+	w.pusher, err = jsonparser.GetString(w.Original, "pusher", "name")
 	if err != nil {
 		w.pusher = ""
 		return err
 	}
 
-	URLString, err := jsonparser.GetString(w.original, "compare")
+	URLString, err := jsonparser.GetString(w.Original, "compare")
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (w PushEventWebhook) Parse() error {
 	}
 
 	// iterate through commits object array from original webhook
-	_, err = jsonparser.ArrayEach(w.original, func(value []byte, dataType jsonparser.ValueType, offset int, err1 error) {
+	_, err = jsonparser.ArrayEach(w.Original, func(value []byte, dataType jsonparser.ValueType, offset int, err1 error) {
 		// these never fail, webhook object contains these, according to GitHub API documentation
 		id, _ := jsonparser.GetString(value, "id")
 		committer, _ := jsonparser.GetString(value, "author", "username")
@@ -142,7 +142,7 @@ type IssueEventWebhook struct {
 	action   string
 	issue    Issue
 	URL      *url.URL
-	original originalWebhook
+	Original originalWebhook
 }
 
 // PullRequestEventWebhook is a specialized struct of Webhook that holds all pull request event information inside other specialized fields
@@ -150,7 +150,7 @@ type PullRequestEventWebhook struct {
 	action      string
 	pullRequest PullRequest
 	URL         *url.URL
-	original    originalWebhook
+	Original    originalWebhook
 }
 
 // Webhook is a struct that holds a generic received webhook

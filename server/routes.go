@@ -52,7 +52,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 		switch eventType {
 		case "push":
 			webhook := hooks.PushEventWebhook{
-				original: body,
+				Original: body,
 			}
 			err = webhook.Parse()
 			if err != nil {
