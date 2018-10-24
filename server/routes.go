@@ -54,7 +54,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 			webhook := hooks.PushEventWebhook{
 				original: body,
 			}
-			err = webhook.parse()
+			err = webhook.Parse()
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprint(w, "Can't parse webhook")
@@ -70,7 +70,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 				}, "handleGitHook hit")
 				return
 			}
-			hookBody, err := webhook.body()
+			hookBody, err := webhook.Body()
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprint(w, "Can't parse webhook")
