@@ -18,7 +18,6 @@ import (
 func (s *server) handleGitHubHook() http.HandlerFunc {
 	var (
 		init sync.Once
-		err  error
 	)
 	return func(w http.ResponseWriter, r *http.Request) {
 		init.Do(func() {
@@ -87,7 +86,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 				return
 			}
 			hookBodyReader := bytes.NewReader(hookBody)
-			resp, err := http.Post(s.env.Get("REDIRECT_URL").(string), "application/json", hookBodyReader)
+			_, err = http.Post(s.env.Get("REDIRECT_URL").(string), "application/json", hookBodyReader)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprint(w, "Can't redirect webhook")
