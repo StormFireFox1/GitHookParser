@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"sync"
@@ -20,11 +21,13 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 		err  error
 	)
 	return func(w http.ResponseWriter, r *http.Request) {
-		init.Do(s.startDB())
+		init.Do(func() {
+			s.startDB()
+		})
 
 		if r.Method != "POST" {
 			w.WriteHeader(http.StatusMethodNotAllowed)
-			w.Write("Bad method! Use POST")
+			fmt.Fprint(w, "Bad method! Use POST")
 			return
 		}
 
@@ -32,7 +35,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 		body, err := ioutil.ReadAll(r.Body())
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write("Can't read body")
+			fmt.Fprint(w, "Can't read body")
 			log.Info(logrus.Fields{
 				"timestamp":    time.Now(),
 				"Host":         r.Host,
@@ -54,7 +57,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 			err = webhook.parse()
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write("Can't parse webhook")
+				fmt.Fprint(w, "Can't parse webhook")
 				log.Info(logrus.Fields{
 					"timestamp":    time.Now(),
 					"Host":         r.Host,
@@ -70,7 +73,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 			hookBody, err := webhook.body()
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write("Can't parse webhook")
+				fmt.Fprint(w, "Can't parse webhook")
 				log.Info(logrus.Fields{
 					"timestamp":    time.Now(),
 					"Host":         r.Host,
@@ -87,7 +90,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 			resp, err := http.Post(s.env.Get("REDIRECT_URL"), "application/json", hookBodyReader)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write("Can't redirect webhook")
+				fmt.Fprint(w, "Can't redirect webhook")
 				log.Info(logrus.Fields{
 					"timestamp":    time.Now(),
 					"Host":         r.Host,
@@ -101,7 +104,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 				return
 			}
 			w.WriteHeader(http.StatusOK)
-			w.Write("Success")
+			fmt.Fprint(w, "Success")
 			log.Info(logrus.Fields{
 				"timestamp":    time.Now(),
 				"Host":         r.Host,
@@ -123,7 +126,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 		case "ping":
 			zen, _ = jsonparser.GetString(body, "zen")
 			w.WriteHeader(http.StatusOK)
-			w.Write(zen)
+			fmt.Fprint(w, zen)
 			log.Info(logrus.Fields{
 				"timestamp":  time.Now(),
 				"Host":       r.Host,
@@ -144,7 +147,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 			return
 		default:
 			w.WriteHeader(http.StatusNotImplemented)
-			w.Write("Event type not supported by handler")
+			fmt.Fprint(w, "Event type not supported by handler")
 			log.Info(logrus.Fields{
 				"timestamp":    time.Now(),
 				"Host":         r.Host,
