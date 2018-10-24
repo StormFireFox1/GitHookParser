@@ -29,7 +29,11 @@ type PushEventWebhook struct {
 	original originalWebhook
 }
 
-func (w PushEventWebhook) parse() error {
+// Parse reads the original webhook and parses it, in order to fill all the necessary fields
+// for each struct.
+//
+// Particularly, this Parse() method fills a PushEventWebhook's fields.
+func (w PushEventWebhook) Parse() error {
 	var err error
 
 	// get normal entries
@@ -95,9 +99,12 @@ func (w PushEventWebhook) parse() error {
 	return nil
 }
 
-func (w PushEventWebhook) body(apiToken string, userKey string) ([]byte, error) {
+// Body displays the body of a POST request to be sent to a different system.
+//
+// Currently, GitHookParser supports only Pushover, so the body will be modeled after their API.
+func (w PushEventWebhook) Body(apiToken string, userKey string) ([]byte, error) {
 	if w.repo == "" || w.pusher == "" || w.commits == nil || w.URL == nil {
-		return nil, errors.New("Cannot display body for webhook: Empty values present. Did you call parse() on the webhook first?")
+		return nil, errors.New("Cannot display body for webhook: Empty values present. Did you call Parse() on the webhook first?")
 	}
 
 	var tempMap map[string]interface{}
