@@ -22,5 +22,5 @@ func init() {
 	}
 
 	Logger.Formatter = &logrus.JSONFormatter{}
-	Logger.SetLevel(logrus.WarnLevel)
+	Logger.SetLevel(logrus.InfoLevel)
 }
