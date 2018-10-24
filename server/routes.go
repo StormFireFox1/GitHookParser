@@ -32,7 +32,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 		}
 
 		eventType := r.Header.Get("X-GitHub-Event")
-		body, err := ioutil.ReadAll(r.Body())
+		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Can't read body")
@@ -51,7 +51,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 
 		switch eventType {
 		case "push":
-			webhook := hooks.Webhook{
+			webhook := hooks.PushEventWebhook{
 				original: body,
 			}
 			err = webhook.parse()
@@ -87,7 +87,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 				return
 			}
 			hookBodyReader := bytes.NewReader(hookBody)
-			resp, err := http.Post(string(s.env.Get("REDIRECT_URL")), "application/json", hookBodyReader)
+			resp, err := http.Post(s.env.Get("REDIRECT_URL").(string), "application/json", hookBodyReader)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprint(w, "Can't redirect webhook")
@@ -114,7 +114,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 				"EventType":    eventType,
 				"ResponseCode": http.StatusOK,
 			}, "handleGitHook hit")
-			err = s.addGitHook(body, "github")
+			err = s.addHook(body, "github")
 			if err != nil {
 				log.Info(logrus.Fields{
 					"timestamp": time.Now(),
@@ -124,7 +124,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 			}
 			return
 		case "ping":
-			zen, _ = jsonparser.GetString(body, "zen")
+			zen, _ := jsonparser.GetString(body, "zen")
 			w.WriteHeader(http.StatusOK)
 			fmt.Fprint(w, zen)
 			log.Info(logrus.Fields{
@@ -136,7 +136,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 				"EventType":  eventType,
 				"Zen":        zen,
 			}, "handleGitHook ping hit")
-			err = s.addGitHook(body, "github")
+			err = s.addHook(body, "github")
 			if err != nil {
 				log.Info(logrus.Fields{
 					"timestamp": time.Now(),

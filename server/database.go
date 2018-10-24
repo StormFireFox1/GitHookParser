@@ -33,7 +33,7 @@ func (s *server) addHook(hook []byte, category string) error {
 		return err
 	}
 
-	_, err := statement.Exec(hook, category, time.Now().String())
+	_, err = statement.Exec(hook, category, time.Now().String())
 	if err != nil {
 		return err
 	}
