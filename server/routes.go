@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -31,7 +32,8 @@ func (s *Server) handleGitHubHook() http.HandlerFunc {
 		}
 
 		eventType := r.Header.Get("X-GitHub-Event")
-		body, err := ioutil.ReadAll(r.Body)
+		body, _ := ioutil.ReadAll(r.Body)
+		decodedBody, err := base64.StdEncoding.DecodeString(body)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Can't read body")
