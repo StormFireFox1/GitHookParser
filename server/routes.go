@@ -69,7 +69,7 @@ func (s *Server) handleGitHubHook() http.HandlerFunc {
 				}, "handleGitHook hit")
 				return
 			}
-			hookBody, err := webhook.Body(s.Env.Get("API_TOKEN").(string), s.Env.Get("USER_KEY").(string))
+			hookBody, err := webhook.Body(fmt.Sprint(s.Env.Get("API_TOKEN")), fmt.Sprint(s.Env.Get("USER_KEY")))
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprint(w, "Can't parse webhook")
@@ -86,7 +86,7 @@ func (s *Server) handleGitHubHook() http.HandlerFunc {
 				return
 			}
 			hookBodyReader := bytes.NewReader(hookBody)
-			_, err = http.Post(s.Env.Get("REDIRECT_URL").(string), "application/json", hookBodyReader)
+			_, err = http.Post(fmt.Sprint(s.Env.Get("REDIRECT_URL")), "application/json", hookBodyReader)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprint(w, "Can't redirect webhook")
