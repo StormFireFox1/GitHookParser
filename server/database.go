@@ -15,20 +15,20 @@ import (
 // startDB initializes a database in a separate directory.
 //
 // This should only be run once.
-func (s *server) startDB() {
+func (s *Server) startDB() {
 	db, err := sql.Open("sqlite3", "./db/hooks.db")
 	if err != nil {
 		log.Fatal(logrus.Fields{}, fmt.Errorf("Error starting up database: %v", err))
 	}
-	s.db = db
+	s.DB = db
 
 }
 
 // addHook adds a webhook to the database in the correct category.
 //
 // An error is returned if the database throws an error.
-func (s *server) addHook(hook []byte, category string) error {
-	statement, err := s.db.Prepare("INSERT INTO hooks(hook, category, created) VALUES(?, ?, ?)")
+func (s *Server) addHook(hook []byte, category string) error {
+	statement, err := s.DB.Prepare("INSERT INTO hooks(hook, category, created) VALUES(?, ?, ?)")
 	if err != nil {
 		return err
 	}

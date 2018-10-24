@@ -7,13 +7,15 @@ import (
 	"github.com/stormfirefox1/GitHookParser/config"
 )
 
-type server struct {
-	router *http.ServeMux
-	env    config.Env
-	db     *sql.DB
+// Server is the struct that will contain all the information the standard library needs in order to run correctly.
+type Server struct {
+	Router *http.ServeMux
+	Env    config.Env
+	DB     *sql.DB
 }
 
-// routes configures all of the functions for the whole server
-func (s *server) routes() {
-	s.router.HandleFunc("/github-hook", s.handleGitHubHook())
+// Routes configures all of the functions for the whole server
+func (s *Server) Routes() {
+	s.Router = http.NewServeMux()
+	s.Router.HandleFunc("/github-hook", s.handleGitHubHook())
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/stormfirefox1/GitHookParser/log"
 )
 
-func (s *server) handleGitHubHook() http.HandlerFunc {
+func (s *Server) handleGitHubHook() http.HandlerFunc {
 	var (
 		init sync.Once
 	)
@@ -69,7 +69,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 				}, "handleGitHook hit")
 				return
 			}
-			hookBody, err := webhook.Body(s.env.Get("API_TOKEN").(string), s.env.Get("USER_KEY").(string))
+			hookBody, err := webhook.Body(s.Env.Get("API_TOKEN").(string), s.Env.Get("USER_KEY").(string))
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprint(w, "Can't parse webhook")
@@ -86,7 +86,7 @@ func (s *server) handleGitHubHook() http.HandlerFunc {
 				return
 			}
 			hookBodyReader := bytes.NewReader(hookBody)
-			_, err = http.Post(s.env.Get("REDIRECT_URL").(string), "application/json", hookBodyReader)
+			_, err = http.Post(s.Env.Get("REDIRECT_URL").(string), "application/json", hookBodyReader)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprint(w, "Can't redirect webhook")

@@ -14,17 +14,17 @@ import (
 )
 
 func main() {
-	fmt.Printf("GitHookParser v.%s \n", config.Get("APP_VERSION"))
 	log.Info(logrus.Fields{
 		"bootTime": time.Now(),
-		"version":  config.Get("APP_VERSION"),
 	}, "Booting up...")
 
-	server := server.server{
-		env: config.New("$HOME/.config/git-hook-parser"),
+	server := server.Server{
+		Env: config.New("$HOME/.config/git-hook-parser/config.yml"),
 	}
 
-	server.routes()
+	fmt.Printf("GitHookParser v.%s \n", server.Env.Get("APP_VERSION"))
+	fmt.Printf("Listening on port " + fmt.Sprint(server.Env.Get("HANDLER_PORT")))
+	server.Routes()
 
-	http.ListenAndServe(config.Get("HANDLER_PORT"), server.router)
+	http.ListenAndServe(fmt.Sprint(server.Env.Get("HANDLER_PORT")), server.Router)
 }
